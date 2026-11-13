@@ -16,6 +16,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.to_do_list.ui.theme.TodolistTheme
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,55 +48,56 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TodoScreen(modifier: Modifier = Modifier) {
-    // list of tasks
-    val tasks = listOf(
-        "Task1",
-        "Task2",
-        "Task3",
-        "Task4",
-        "Task5",
-        "Task6",
-        "Task7",
-        "Task8",
-        "Task9",
-        "Task10",
-        "Task11",
-        "Task12",
-        "Task13",
-        "Task14",
-        "Task15",
-        "Task16",
-        "Task17",
-        "Task18",
-        "Task19",
-        "Task20",
-        "Task21",
-        "Task22",
-        "Task23",
-        "Task24",
-        "Task25",
-        "Task26",
-        "Task27",
-        "Task28",
-        "Task29",
-        "Task30"
-    )
-    // LazyColumn to display the tasks, vertically scrollable
-    LazyColumn(modifier = modifier.fillMaxSize().padding(16.dp)) {
-        items(tasks) { task->
-            Text(
-                text = task,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            HorizontalDivider()
+    // 1. State variables: Compose watches these and redraws the screen when they change
+    var newTaskText by remember { mutableStateOf("") }
+    val tasks = remember { mutableStateListOf("Task1", "Task2", "Task3") }
 
+    // 2. Column stacks the input row on top of the scrollable list
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // 3. Row places the text box and Add button side-by-side
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = newTaskText,
+                onValueChange = { newTaskText = it },
+                label = { Text("Enter a task") },
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(
+                onClick = {
+                    if (newTaskText.isNotBlank()) {
+                        tasks.add(newTaskText)
+                        newTaskText = "" // Clears the text box after adding
+                    }
+                }
+            ) {
+                Text("Add")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 4. Your existing scrollable list
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(tasks) { task ->
+                Text(
+                    text = task,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                HorizontalDivider()
+            }
         }
     }
 }
 
-
-
-}@Preview(showBackground = true)
+@Preview(showBackground = true)
 @Composable
 fun TodoScreenPreview() {
     TodolistTheme {
